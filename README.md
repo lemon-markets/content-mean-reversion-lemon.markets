@@ -24,7 +24,8 @@ If you want to test locally, you need to define a number of environment variable
 | CLIENT_ID |   Your client id   |   
 | CLIENT_SECRET | Your client secret |
 |MIC| Market Identifier Code of Trading Venue|
-|BASE_URL | Base URL of our paper money API |
+|BASE_URL_TRADING | Base URL of our paper Trading API |
+|BASE_URL_DATA | Base URL of our Market Data API |
 |AUTH_URL | URL of our authentication API|
 |SPACE_UUID | Your Space UUID |
 
