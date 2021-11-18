@@ -1,7 +1,6 @@
 from models.Order import Order
 from models.Instruments import Instruments
 from models.TradingVenue import TradingVenue
-from models.Token import Token
 import time
 import statistics
 import os
