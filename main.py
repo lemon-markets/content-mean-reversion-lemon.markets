@@ -4,6 +4,8 @@ from models.TradingVenue import TradingVenue
 from models.Token import Token
 import time
 import statistics
+import os
+from dotenv import load_dotenv
 
 
 def mean_reversion_decision(isin: str, x1: str = "d1"):
@@ -35,6 +37,8 @@ def check_if_buy(isin: str, x1: str = "d1"):
     :param isin: pass the isin of the stock you are interested in
     :param x1:  pass the market data format you are interested in (m1, h1, or d1)
     """
+    load_dotenv()
+
     # check for MR decision
     if mean_reversion_decision(
             isin=isin,
@@ -45,9 +49,12 @@ def check_if_buy(isin: str, x1: str = "d1"):
             print('buy')
             placed_order = Order(
                 isin=isin,
-                valid_until=time.time() + 86400,
+                expires_at="p7d",
                 side="buy",
-                quantity=1
+                quantity=1,
+                venue=os.getenv("MIC"),
+                space_id=os.getenv("SPACE_ID")
+
             ).place_order()
             order_uuid = placed_order.get('uuid')
             # subsequently activate the order
@@ -63,9 +70,11 @@ def check_if_buy(isin: str, x1: str = "d1"):
             print('sell')
             placed_order = Order(
                 isin=isin,
-                valid_until=time.time() + 86400,
+                expires_at="p7d",
                 side="sell",
-                quantity=1
+                quantity=1,
+                venue=os.getenv("MIC"),
+                space_id=os.getenv("SPACE_ID")
             ).place_order()
             order_uuid = placed_order.get('uuid')
             activated_order = Order().activate_order(order_uuid)
@@ -82,8 +91,6 @@ def mean_reversion():
     """
     while True:
         if TradingVenue().check_if_open():
-            # make sure that you always have a functioning token
-            Token().get_new_token()
             # make buy or sell decision
             check_if_buy(
                 isin="US88160R1014",  # this is Tesla, but you can obviously use any ISIN you like :)

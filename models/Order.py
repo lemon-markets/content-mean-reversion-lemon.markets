@@ -5,39 +5,41 @@ from helpers import RequestHandler
 
 class Order(RequestHandler):
 
-    def __init__(self, isin: str = "", valid_until: float = 0, quantity: int = 0, side: str = "",
-                 stop_price: float = 0, limit_price: float = 0, uuid: str = ""):
+    def __init__(self, isin: str = "", expires_at: str = "", quantity: int = 0, side: str = "",
+                 stop_price: float = 0, limit_price: float = 0, uuid: str = "", venue: str = "", space_id: str = ""):
         self.isin = isin
-        self.valid_until = valid_until
+        self.expires_at = expires_at
         self.quantity = quantity
         self.side = side
         self.stop_price = stop_price
         self.limit_price = limit_price
+        self.venue = venue
         self.uuid = uuid
+        self.space_id = space_id
 
     def place_order(self):
         order_details = {
-            "isin": self.isin,  # set ISIN
-            "valid_until": self.valid_until,  # specify your timestamp
-            "side": self.side,  # set side
-            "quantity": self.quantity,  # set quantity
+            "isin": self.isin,
+            "expires_at": self.expires_at,
+            "side": self.side,
+            "quantity": self.quantity,
+            "venue": self.venue,
+            "space_id": self.space_id,
         }
         load_dotenv()
-        space_uuid = os.getenv("SPACE_UUID")
-        endpoint = f'spaces/{space_uuid}/orders/'
+        endpoint = f'orders/'
         response = self.post_data(endpoint, order_details)
         return response
 
     def get_orders(self):
         load_dotenv()
-        space_uuid = os.getenv("SPACE_UUID")
-        endpoint = f'spaces/{space_uuid}/orders/'
+        space_id = os.getenv("SPACE_ID")
+        endpoint = f'orders/?space_id={space_id}/'
         response = self.get_data_trading(endpoint)
         return response
 
     def activate_order(self, order_uuid):
         load_dotenv()
-        space_uuid = os.getenv("SPACE_UUID")
-        endpoint = f'spaces/{space_uuid}/orders/{order_uuid}/activate/'
+        endpoint = f'orders/{order_uuid}/activate/'
         response = self.put_data(endpoint)
         return response

@@ -1,5 +1,6 @@
 import os
 import requests
+import json
 from dotenv import load_dotenv
 
 
@@ -47,7 +48,7 @@ class RequestHandler:
 
     def post_data(self, endpoint: str, data):
         response = requests.post(self.url_trading + endpoint,
-                                 data,
+                                 json.dumps(data),
                                  headers={
                                      "Authorization": "Bearer " + os.environ.get("TOKEN_KEY")
                                  })
