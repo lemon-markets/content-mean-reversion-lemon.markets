@@ -20,14 +20,11 @@ If you want to test locally, you need to define a number of environment variable
 
 | ENV Variable   |      Explanation      |  
 |----------|:-------------:|
-| TOKEN_KEY |  Your Access Token | 
-| CLIENT_ID |   Your client id   |   
-| CLIENT_SECRET | Your client secret |
+| API_KEY |  Your API key |
 |MIC| Market Identifier Code of Trading Venue|
 |BASE_URL_TRADING | Base URL of our paper Trading API |
 |BASE_URL_DATA | Base URL of our Market Data API |
-|AUTH_URL | URL of our authentication API|
-|SPACE_UUID | Your Space UUID |
+|SPACE_ID | Your Space ID |
 
 ## Deploy to Heroku
 If you are interested in hosting this project in the cloud, 

@@ -8,21 +8,11 @@ class RequestHandler:
     load_dotenv()
     url_data: str = os.environ.get("BASE_URL_DATA")
     url_trading: str = os.environ.get("BASE_URL_TRADING")
-    auth_url: str = os.environ.get("AUTH_URL")
-
-    def get_token(self, endpoint: str, data):
-        """
-        :param data:
-        :param endpoint:
-        :return: access token as String
-        """
-        response = requests.post(self.auth_url + endpoint, data)
-        return response
 
     def get_data_trading(self, endpoint: str):
         response = requests.get(self.url_trading + endpoint,
                                 headers={
-                                    "Authorization": "Bearer " + os.environ.get("TOKEN_KEY")
+                                    "Authorization": "Bearer " + os.environ.get("API_KEY")
                                 })
 
         return response.json()
@@ -34,7 +24,7 @@ class RequestHandler:
         """
         response = requests.get(self.url_data + endpoint,
                                 headers={
-                                    "Authorization": "Bearer " + os.environ.get("TOKEN_KEY")
+                                    "Authorization": "Bearer " + os.environ.get("API_KEY")
                                 })
 
         return response.json()
@@ -42,7 +32,7 @@ class RequestHandler:
     def put_data(self, endpoint: str):
         response = requests.put(self.url_trading + endpoint,
                                 headers={
-                                    "Authorization": "Bearer " + os.environ.get("TOKEN_KEY")
+                                    "Authorization": "Bearer " + os.environ.get("API_KEY")
                                 })
         return response.json()
 
@@ -50,6 +40,6 @@ class RequestHandler:
         response = requests.post(self.url_trading + endpoint,
                                  json.dumps(data),
                                  headers={
-                                     "Authorization": "Bearer " + os.environ.get("TOKEN_KEY")
+                                     "Authorization": "Bearer " + os.environ.get("API_KEY")
                                  })
         return response.json()

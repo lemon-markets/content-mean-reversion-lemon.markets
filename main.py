@@ -55,9 +55,9 @@ def check_if_buy(isin: str, x1: str = "d1"):
                 space_id=os.getenv("SPACE_ID")
 
             ).place_order()
-            order_uuid = placed_order.get('uuid')
+            order_id = placed_order['results'].get('id')
             # subsequently activate the order
-            activated_order = Order().activate_order(order_uuid)
+            activated_order = Order().activate_order(order_id)
             print(activated_order)
             time.sleep(14400)  # check back in 4 hours
         except Exception as e:
@@ -74,10 +74,14 @@ def check_if_buy(isin: str, x1: str = "d1"):
                 quantity=1,
                 venue=os.getenv("MIC"),
                 space_id=os.getenv("SPACE_ID")
-            ).place_order()
-            order_uuid = placed_order.get('uuid')
-            activated_order = Order().activate_order(order_uuid)
-            print(activated_order)
+            ).place_order().get('results', None)
+            # if position in portfolio, activate order
+            if placed_order is not None:
+                order_id = placed_order.get('id')
+                activated_order = Order().activate_order(order_id)
+                print(activated_order)
+            else:
+                print("You do not have sufficient holdings to place this order.")
             time.sleep(14400)  # check back in 4 hours
         except Exception as e:
             print(f'2{e}')
