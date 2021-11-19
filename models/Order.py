@@ -6,7 +6,7 @@ from helpers import RequestHandler
 class Order(RequestHandler):
 
     def __init__(self, isin: str = "", expires_at: str = "", quantity: int = 0, side: str = "",
-                 stop_price: float = 0, limit_price: float = 0, uuid: str = "", venue: str = "", space_id: str = ""):
+                 stop_price: int = 0, limit_price: int = 0, uuid: str = "", venue: str = "", space_id: str = ""):
         self.isin = isin
         self.expires_at = expires_at
         self.quantity = quantity
@@ -41,5 +41,5 @@ class Order(RequestHandler):
     def activate_order(self, order_uuid):
         load_dotenv()
         endpoint = f'orders/{order_uuid}/activate/'
-        response = self.put_data(endpoint)
+        response = self.post_data(endpoint, {})
         return response
