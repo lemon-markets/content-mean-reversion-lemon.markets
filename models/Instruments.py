@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from helpers import RequestHandler
-import time
+from datetime import datetime, timedelta
 
 
 class Instruments(RequestHandler):
@@ -13,8 +13,8 @@ class Instruments(RequestHandler):
     def get_market_data(self):
         load_dotenv()
         mic = os.getenv("MIC")
-        from_date = "2021-09-01T00:01:00.000"
-        to_date = "2021-09-08T00:01:00.000"
+        from_date = datetime.now() - timedelta(days=7)
+        to_date = datetime.now()
         isin = self.isin
         x1 = self.x1
         endpoint = f'ohlc/{x1}/?mic={mic}&isin={isin}&from={from_date}&to={to_date}'
