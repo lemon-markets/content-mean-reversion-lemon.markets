@@ -91,15 +91,15 @@ def mean_reversion():
     main function to be executed
     """
     while True:
-        # if TradingVenue().check_if_open():
+        if TradingVenue().check_if_open():
             # make buy or sell decision
             check_if_buy(
                 isin="US88160R1014",  # this is Tesla, but you can obviously use any ISIN you like :)
                 x1="d1"
             )
-        # else:
-        #     # sleep until market reopens in case it is closed
-        #     time.sleep(TradingVenue().seconds_till_tv_opens())
+        else:
+            # sleep until market reopens in case it is closed
+            time.sleep(TradingVenue().seconds_till_tv_opens())
 
 
 if __name__ == '__main__':
