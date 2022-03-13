@@ -13,13 +13,12 @@ class Instruments(RequestHandler):
     def get_market_data(self):
         load_dotenv()
         mic = os.getenv("MIC")
-        from_date = datetime.now() - timedelta(days=7)
-        to_date = datetime.now()
+        from_date = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
+        to_date = datetime.today().strftime('%Y-%m-%d')
         isin = self.isin
         x1 = self.x1
         endpoint = f'ohlc/{x1}/?mic={mic}&isin={isin}&from={from_date}&to={to_date}'
         response = self.get_data_data(endpoint)
-        print(response)
         return response
 
     def get_latest_market_data(self):

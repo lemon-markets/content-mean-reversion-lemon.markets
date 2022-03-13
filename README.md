@@ -24,7 +24,6 @@ If you want to test locally, you need to define a number of environment variable
 |MIC| Market Identifier Code of Trading Venue|
 |BASE_URL_TRADING | Base URL of our paper Trading API |
 |BASE_URL_DATA | Base URL of our Market Data API |
-|SPACE_ID | Your Space ID |
 
 ## Deploy to Heroku
 If you are interested in hosting this project in the cloud, 
@@ -32,7 +31,7 @@ we suggest that you use Heroku to do so. To make the hosting
 work, you need to create a new project and connect 
 your GitHub repo. You can find a good explanation [here](https://dev.to/josylad/how-to-deploy-a-python-script-or-bot-to-heroku-in-5-minutes-9dp).
 Additionally, you need to specify the environment variables
-through heroku directly. You can do so by either using:
+through Heroku directly. You can do so by either using:
 
 ```
 heroku config:set [KEY_NAME=value …]

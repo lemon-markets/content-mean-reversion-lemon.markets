@@ -17,6 +17,7 @@ def mean_reversion_decision(isin: str, x1: str = "d1"):
         isin=isin,
         x1=x1
     ).get_market_data()
+    print(market_data)
     d1_prices = market_data['results']
     prices_close = [x["c"] for x in d1_prices]  # you can obviously change that to low, close or open
     mean_price = statistics.mean(prices_close)
@@ -52,8 +53,6 @@ def check_if_buy(isin: str, x1: str = "d1"):
                 side="buy",
                 quantity=1,
                 venue=os.getenv("MIC"),
-                space_id=os.getenv("SPACE_ID")
-
             ).place_order()
             order_id = placed_order['results'].get('id')
             # subsequently activate the order
@@ -73,7 +72,6 @@ def check_if_buy(isin: str, x1: str = "d1"):
                 side="sell",
                 quantity=1,
                 venue=os.getenv("MIC"),
-                space_id=os.getenv("SPACE_ID")
             ).place_order().get('results', None)
             # if position in portfolio, activate order
             if placed_order is not None:
@@ -93,15 +91,15 @@ def mean_reversion():
     main function to be executed
     """
     while True:
-        if TradingVenue().check_if_open():
+        # if TradingVenue().check_if_open():
             # make buy or sell decision
             check_if_buy(
                 isin="US88160R1014",  # this is Tesla, but you can obviously use any ISIN you like :)
                 x1="d1"
             )
-        else:
-            # sleep until market reopens in case it is closed
-            time.sleep(TradingVenue().seconds_till_tv_opens())
+        # else:
+        #     # sleep until market reopens in case it is closed
+        #     time.sleep(TradingVenue().seconds_till_tv_opens())
 
 
 if __name__ == '__main__':
