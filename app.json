@@ -7,6 +7,6 @@
   ],
   "website": "https://www.lemon.markets/de-de",
   "repository": "https://github.com/lemon-markets/content-mean-reversion-lemon.markets",
-  "logo": "https://www.lemon.markets/images/logo.svg"
-  "success_url": "/",
+  "logo": "https://www.lemon.markets/images/logo.svg",
+  "success_url": "/"
 }
