@@ -5,11 +5,11 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 
-from models import TradingVenue
+from models.TradingVenue import TradingVenue
 
 load_dotenv()
 client = api.create(
-    trading_api_token=os.environ.get('TRADING_API_KEY'),
+    trading_api_token=os.environ.get('PAPER_TRADING_API_KEY'),
     market_data_api_token=os.environ.get('DATA_API_KEY'),
     env='paper'
 )

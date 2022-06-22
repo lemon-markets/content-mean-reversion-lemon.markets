@@ -2,10 +2,10 @@
 This repository contains a Python Script that implements the mean reversion
 strategy using the [lemon.markets](https://www.lemon.markets/) API.
 ## Project Structure
-The models folder contains TradingVenue, with helper functions dedicated to calculating wait times for your mean-reversion
+The **models** folder contains **TradingVenue.py**, with helper functions dedicated to calculating wait times for your mean-reversion
 trading algorithm when the market is closed. 
 
-The actual mean reversion is logic is defined in the **main.py** file with 
+The actual mean reversion logic is defined in the **main.py** file, with 
 mean_reversion() being the main function. 
 
 ## Set up
