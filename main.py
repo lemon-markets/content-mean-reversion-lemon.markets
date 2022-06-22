@@ -5,6 +5,8 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 
+from models import TradingVenue
+
 load_dotenv()
 client = api.create(
     trading_api_token=os.environ.get('TRADING_API_KEY'),
@@ -36,7 +38,7 @@ def mean_reversion_decision(isin: str, x1: str = "d1"):
         isin=isin,
         from_='latest',
         period="m1"
-    ).results[0].c
+    ).results.__getitem__(0).c
     print(f'Latest Close Price: {latest_close_price}')
     if latest_close_price < mean_price:
         return True
@@ -105,12 +107,12 @@ def mean_reversion():
         if client.market_data.venues.get(os.getenv('MIC')).results[0].is_open:
             # make buy or sell decision
             check_if_buy(
-                isin="DE0007664039",  # this is Tesla, but you can obviously use any ISIN you like :)
+                isin="DE0007664039",  # this is Volkswagen, but you can obviously use any ISIN you like :)
                 x1="d1"
             )
         else:
             # sleep until market reopens in case it is closed
-            time.sleep(client.market_data.venues.get('xmun'))
+            time.sleep(TradingVenue.seconds_till_tv_opens())
 
 
 if __name__ == '__main__':
