@@ -38,7 +38,7 @@ def mean_reversion_decision(isin: str, x1: str = "d1"):
         isin=isin,
         from_='latest',
         period="m1"
-    ).results.__getitem__(0).c
+    ).results[0].c
     print(f'Latest Close Price: {latest_close_price}')
     if latest_close_price < mean_price:
         return True

@@ -21,7 +21,7 @@ class TradingVenue:
         load_dotenv()
         times_venue = client.market_data.venues.get(os.getenv('MIC'))
         today = datetime.datetime.today()
-        opening_days_venue = times_venue.results.__getitem__('opening_days')
+        opening_days_venue = times_venue.results[0].opening_days
         next_opening_day = datetime.datetime.strptime(opening_days_venue[0], '%Y-%m-%d')
         next_opening_hour = datetime.datetime.strptime(times_venue.results[0].opening_hours.get('start', None), '%H:%M')
         date_difference = next_opening_day - today
