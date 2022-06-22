@@ -112,7 +112,8 @@ def mean_reversion():
             )
         else:
             # sleep until market reopens in case it is closed
-            time.sleep(TradingVenue.seconds_till_tv_opens())
+            print("Waiting for market open...")
+            time.sleep(TradingVenue().seconds_till_tv_opens())
 
 
 if __name__ == '__main__':

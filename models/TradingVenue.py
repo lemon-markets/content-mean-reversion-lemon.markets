@@ -22,12 +22,12 @@ class TradingVenue:
         times_venue = client.market_data.venues.get(os.getenv('MIC'))
         today = datetime.datetime.today()
         opening_days_venue = times_venue.results[0].opening_days
-        next_opening_day = datetime.datetime.strptime(opening_days_venue[0], '%Y-%m-%d')
-        next_opening_hour = datetime.datetime.strptime(times_venue.results[0].opening_hours.get('start', None), '%H:%M')
+        next_opening_day = datetime.datetime.combine(opening_days_venue[0], datetime.datetime.min.time())
+        next_opening_hour = datetime.datetime.combine(opening_days_venue[0], times_venue.results[0].opening_hours.start)
         date_difference = next_opening_day - today
         days = date_difference.days + 1
 
-        if not self.check_if_open():
+        if not self.is_open:
             print('Trading Venue not open')
             time_delta = datetime.datetime.combine(
                 datetime.datetime.now().date() + timedelta(days=1), next_opening_hour.time()
