@@ -105,7 +105,7 @@ def mean_reversion():
         if client.market_data.venues.get(os.getenv('MIC')).results[0].is_open:
             # make buy or sell decision
             check_if_buy(
-                isin="US88160R1014",  # this is Tesla, but you can obviously use any ISIN you like :)
+                isin="DE0007664039",  # this is Tesla, but you can obviously use any ISIN you like :)
                 x1="d1"
             )
         else:

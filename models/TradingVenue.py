@@ -13,7 +13,7 @@ client = api.create(
 print(client)
 
 
-class TradingVenue():
+class TradingVenue:
     def __init__(self, is_open: bool = False):
         self.is_open = is_open
 
