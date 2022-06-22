@@ -1,10 +1,17 @@
-from models.Order import Order
-from models.Instruments import Instruments
-from models.TradingVenue import TradingVenue
+from lemon import api
 import time
 import statistics
 import os
 from dotenv import load_dotenv
+from datetime import datetime, timedelta
+
+load_dotenv()
+client = api.create(
+    trading_api_token=os.environ.get('TRADING_API_KEY'),
+    market_data_api_token=os.environ.get('DATA_API_KEY'),
+    env='paper'
+)
+print(client)
 
 
 def mean_reversion_decision(isin: str, x1: str = "d1"):
@@ -13,19 +20,23 @@ def mean_reversion_decision(isin: str, x1: str = "d1"):
     :param x1: pass what type of data you want to retrieve (m1, h1 or d1)
     :return: returns whether you should buy (True) or sell (False), depending on MR criteria
     """
-    market_data = Instruments(
+    from_date = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
+    market_data = client.market_data.ohlc.get(
         isin=isin,
-        x1=x1
-    ).get_market_data()
+        from_=from_date,
+        period=x1
+    )
     print(market_data)
-    d1_prices = market_data['results']
-    prices_close = [x["c"] for x in d1_prices]  # you can obviously change that to low, close or open
+
+    d1_prices = market_data.results
+    prices_close = [x.c for x in d1_prices]  # you can obviously change that to low, close or open
     mean_price = statistics.mean(prices_close)
     print(f'Mean Price: {mean_price}')
-    latest_close_price = Instruments(
+    latest_close_price = client.market_data.ohlc.get(
         isin=isin,
-        x1="m1"
-    ).get_latest_market_data()
+        from_='latest',
+        period="m1"
+    ).results[0].c
     print(f'Latest Close Price: {latest_close_price}')
     if latest_close_price < mean_price:
         return True
@@ -47,16 +58,16 @@ def check_if_buy(isin: str, x1: str = "d1"):
         # create a buy order if True is returned by MR decision function
         try:
             print('buy')
-            placed_order = Order(
+            placed_order = client.trading.orders.create(
                 isin=isin,
                 expires_at="p7d",
                 side="buy",
                 quantity=1,
                 venue=os.getenv("MIC"),
-            ).place_order()
-            order_id = placed_order['results'].get('id')
+            )
+            order_id = placed_order.results.id
             # subsequently activate the order
-            activated_order = Order().activate_order(order_id)
+            activated_order = client.trading.orders.activate(order_id)
             print(activated_order)
             time.sleep(14400)  # check back in 4 hours
         except Exception as e:
@@ -66,17 +77,17 @@ def check_if_buy(isin: str, x1: str = "d1"):
         try:
             # create a sell order if mean reversion decision returns False
             print('sell')
-            placed_order = Order(
+            placed_order = client.trading.orders.create(
                 isin=isin,
                 expires_at="p7d",
                 side="sell",
                 quantity=1,
                 venue=os.getenv("MIC"),
-            ).place_order().get('results', None)
+            )
             # if position in portfolio, activate order
             if placed_order is not None:
-                order_id = placed_order.get('id')
-                activated_order = Order().activate_order(order_id)
+                order_id = placed_order.results.id
+                activated_order = client.trading.orders.activate(order_id)
                 print(activated_order)
             else:
                 print("You do not have sufficient holdings to place this order.")
@@ -91,7 +102,7 @@ def mean_reversion():
     main function to be executed
     """
     while True:
-        if TradingVenue().check_if_open():
+        if client.market_data.venues.get(os.getenv('MIC')).results[0].is_open:
             # make buy or sell decision
             check_if_buy(
                 isin="US88160R1014",  # this is Tesla, but you can obviously use any ISIN you like :)
@@ -99,7 +110,7 @@ def mean_reversion():
             )
         else:
             # sleep until market reopens in case it is closed
-            time.sleep(TradingVenue().seconds_till_tv_opens())
+            time.sleep(client.market_data.venues.get('xmun'))
 
 
 if __name__ == '__main__':
