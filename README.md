@@ -2,28 +2,25 @@
 This repository contains a Python Script that implements the mean reversion
 strategy using the [lemon.markets](https://www.lemon.markets/) API.
 ## Project Structure
-This project contains a number of models, which you can find in the 
-**models** folder. In there, we define all relevant functions 
-for Instruments, Orders, Token and Trading Venue.
-
-All helper functions are defined in the helpers.py file. 
+The models folder contains TradingVenue, with helper functions dedicated to calculating wait times for your mean-reversion
+trading algorithm when the market is closed. 
 
 The actual mean reversion is logic is defined in the **main.py** file with 
 mean_reversion() being the main function. 
 
 ## Set up
 To test locally, clone this repo, use the IDE of your choice to run (although we highly recommend PyCharm) and install
-all required packages through the provided requirements.txt file.
+all required packages through the provided requirements.txt file. This project uses the lemon.markets Python SDK, which 
+you will find listed in the requirements.
 
 ### Set environment variables
 If you want to test locally, you need to define a number of environment variables.
 
-| ENV Variable   |      Explanation      |  
-|----------|:-------------:|
-| API_KEY |  Your API key |
-|MIC| Market Identifier Code of Trading Venue|
-|BASE_URL_TRADING | Base URL of our paper Trading API |
-|BASE_URL_DATA | Base URL of our Market Data API |
+| ENV Variable |               Explanation               |  
+|--------------|:---------------------------------------:|
+| DATA_API_KEY |        Your market data API key         |
+ | TRADING_API_KEY |    Your paper/money trading API key     |
+| MIC          | Market Identifier Code of Trading Venue |
 
 ## Deploy to Heroku
 If you are interested in hosting this project in the cloud, 
