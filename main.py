@@ -1,14 +1,12 @@
-from lemon import api
-import time
-import statistics
 import os
-from dotenv import load_dotenv
+import statistics
 from datetime import datetime, timedelta
+
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
+from dotenv import load_dotenv
+from lemon import api
 from pytz import utc
-
-from models.TradingVenue import TradingVenue
 
 load_dotenv()
 # create your api client with separate trading and market data api tokens
@@ -106,7 +104,7 @@ if __name__ == '__main__':
         scheduler.add_job(mean_reversion,
                           trigger=CronTrigger(day_of_week="mon-fri",
                                               hour=8 + x,
-                                              minute=30,
+                                              minute=11,
                                               timezone=utc),
                           name="Perform Mean Reversion")
     print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
