@@ -4,16 +4,19 @@ import statistics
 import os
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
+from apscheduler.schedulers.blocking import BlockingScheduler
+from apscheduler.triggers.cron import CronTrigger
+from pytz import utc
 
 from models.TradingVenue import TradingVenue
 
 load_dotenv()
+# create your api client with separate trading and market data api tokens
 client = api.create(
     trading_api_token=os.environ.get('PAPER_TRADING_API_KEY'),
     market_data_api_token=os.environ.get('DATA_API_KEY'),
     env='paper'
 )
-print(client)
 
 
 def mean_reversion_decision(isin: str, x1: str = "d1"):
@@ -28,7 +31,6 @@ def mean_reversion_decision(isin: str, x1: str = "d1"):
         from_=from_date,
         period=x1
     )
-    print(market_data)
 
     d1_prices = market_data.results
     prices_close = [x.c for x in d1_prices]  # you can obviously change that to low, close or open
@@ -45,9 +47,10 @@ def mean_reversion_decision(isin: str, x1: str = "d1"):
     return False
 
 
-def check_if_buy(isin: str, x1: str = "d1"):
+def mean_reversion(isin: str = "DE0007664039", x1: str = "d1"):
     """
-    :param isin: pass the isin of the stock you are interested in
+    :param isin: pass the isin of the stock you are interested in,
+                the default is Volkswagen here, but you can obviously use any ISIN you like :)
     :param x1:  pass the market data format you are interested in (m1, h1, or d1)
     """
     load_dotenv()
@@ -71,10 +74,8 @@ def check_if_buy(isin: str, x1: str = "d1"):
             # subsequently activate the order
             activated_order = client.trading.orders.activate(order_id)
             print(activated_order)
-            time.sleep(14400)  # check back in 4 hours
         except Exception as e:
             print(f'1{e}')
-            time.sleep(60)
     else:
         try:
             # create a sell order if mean reversion decision returns False
@@ -93,28 +94,24 @@ def check_if_buy(isin: str, x1: str = "d1"):
                 print(activated_order)
             else:
                 print("You do not have sufficient holdings to place this order.")
-            time.sleep(14400)  # check back in 4 hours
         except Exception as e:
             print(f'2{e}')
-            time.sleep(60)
-
-
-def mean_reversion():
-    """
-    main function to be executed
-    """
-    while True:
-        if client.market_data.venues.get(os.getenv('MIC')).results[0].is_open:
-            # make buy or sell decision
-            check_if_buy(
-                isin="DE0007664039",  # this is Volkswagen, but you can obviously use any ISIN you like :)
-                x1="d1"
-            )
-        else:
-            # sleep until market reopens in case it is closed
-            print("Waiting for market open...")
-            time.sleep(TradingVenue().seconds_till_tv_opens())
 
 
 if __name__ == '__main__':
-    mean_reversion()
+    scheduler = BlockingScheduler(timezone=utc)
+    # using a scheduler, we run the mean reversion logic once per hour starting from 8:30
+    # (based on Munich Stock Exchange hours)
+    for x in range(13):
+        scheduler.add_job(mean_reversion,
+                          trigger=CronTrigger(day_of_week="mon-fri",
+                                              hour=8 + x,
+                                              minute=30,
+                                              timezone=utc),
+                          name="Perform Mean Reversion")
+    print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
+
+    try:
+        scheduler.start()
+    except (KeyboardInterrupt, SystemExit):
+        pass

@@ -1,3 +1,5 @@
 requests~=2.26.0
 python-dotenv~=0.19.0
-lemon~=1.0.2
+lemon~=1.0.3
+APScheduler~=3.9.1
+pytz~=2022.1
