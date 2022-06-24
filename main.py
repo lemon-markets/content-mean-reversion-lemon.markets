@@ -99,13 +99,15 @@ def mean_reversion(isin: str = "DE0007664039", x1: str = "d1"):
 
 if __name__ == '__main__':
     scheduler = BlockingScheduler(timezone=utc)
-    # using a scheduler, we run the mean reversion logic once per hour starting from 8:30
-    # (based on Munich Stock Exchange hours)
+
     opening_days = client.market_data.venues.get().results[0].opening_days
     for day in opening_days:
+        # using venues endpoint we only schedule trades for days the exchange is open
         date_string = f'{day:%Y-%m-%d}'
         year_month_day = date_string.split("-")
         for x in range(13):
+            # using a scheduler, we run the mean reversion logic once per hour starting from 8:30
+            # (based on Munich Stock Exchange hours)
             scheduler.add_job(mean_reversion,
                               trigger=CronTrigger(year=year_month_day[0],
                                                   month=year_month_day[1],
