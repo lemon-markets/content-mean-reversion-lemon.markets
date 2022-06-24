@@ -96,17 +96,24 @@ def mean_reversion(isin: str = "DE0007664039", x1: str = "d1"):
             print(f'2{e}')
 
 
+
 if __name__ == '__main__':
     scheduler = BlockingScheduler(timezone=utc)
     # using a scheduler, we run the mean reversion logic once per hour starting from 8:30
     # (based on Munich Stock Exchange hours)
-    for x in range(13):
-        scheduler.add_job(mean_reversion,
-                          trigger=CronTrigger(day_of_week="mon-fri",
-                                              hour=8 + x,
-                                              minute=11,
-                                              timezone=utc),
-                          name="Perform Mean Reversion")
+    opening_days = client.market_data.venues.get().results[0].opening_days
+    for day in opening_days:
+        date_string = f'{day:%Y-%m-%d}'
+        year_month_day = date_string.split("-")
+        for x in range(13):
+            scheduler.add_job(mean_reversion,
+                              trigger=CronTrigger(year=year_month_day[0],
+                                                  month=year_month_day[1],
+                                                  day=year_month_day[2],
+                                                  hour=8 + x,
+                                                  minute=30,
+                                                  timezone=utc),
+                              name="Perform Mean Reversion Hourly")
     print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
 
     try:
