@@ -120,6 +120,7 @@ if __name__ == '__main__':
     scheduler = BlockingScheduler(timezone=utc)
 
     # reschedule your trades for the next years ad infinitum
+    schedule_trades_for_year()
     scheduler.add_job(schedule_trades_for_year,
                       trigger=CronTrigger(month=1,
                                           day=1,
