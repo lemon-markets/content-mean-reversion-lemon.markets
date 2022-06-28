@@ -63,7 +63,7 @@ def mean_reversion(isin: str = "DE0007664039", x1: str = "d1"):
             print('buy')
             placed_order = client.trading.orders.create(
                 isin=isin,
-                expires_at="p7d",
+                expires_at=7,
                 side="buy",
                 quantity=1,
                 venue=os.getenv("MIC"),
@@ -80,7 +80,7 @@ def mean_reversion(isin: str = "DE0007664039", x1: str = "d1"):
             print('sell')
             placed_order = client.trading.orders.create(
                 isin=isin,
-                expires_at="p7d",
+                expires_at=7,
                 side="sell",
                 quantity=1,
                 venue=os.getenv("MIC"),
