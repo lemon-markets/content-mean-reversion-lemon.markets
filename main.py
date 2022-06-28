@@ -101,15 +101,13 @@ def schedule_trades_for_year():
 
     for day in opening_days:
         # using venues endpoint we only schedule trades for days the exchange is open
-        date_string = f'{day:%Y-%m-%d}'
-        year_month_day = date_string.split('-')
         for x in range(13):
             # using a scheduler, we run the mean reversion logic once per hour starting from 8:30
-            # (based on Munich Stock Exchange hours)
+            # (based on Munich Stock Exchange hours with times in UTC)
             scheduler.add_job(mean_reversion,
-                              trigger=CronTrigger(year=year_month_day[0],
-                                                  month=year_month_day[1],
-                                                  day=year_month_day[2],
+                              trigger=CronTrigger(year=day.year,
+                                                  month=day.month,
+                                                  day=day.day,
                                                   hour=8 + x,
                                                   minute=30,
                                                   timezone=utc),
@@ -119,8 +117,9 @@ def schedule_trades_for_year():
 if __name__ == '__main__':
     scheduler = BlockingScheduler(timezone=utc)
 
-    # reschedule your trades for the next years ad infinitum
     schedule_trades_for_year()
+
+    # reschedule your trades for the future years ad infinitum
     scheduler.add_job(schedule_trades_for_year,
                       trigger=CronTrigger(month=1,
                                           day=1,
