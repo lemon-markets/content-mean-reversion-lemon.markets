@@ -1,28 +1,43 @@
-# Mean Reversion Strategy with the lemon.markets API
-This repository contains a Python Script that implements the mean reversion
-strategy using the [lemon.markets](https://www.lemon.markets/) API.
-## Project Structure
-The **models** folder contains **TradingVenue.py**, with helper functions dedicated to calculating wait times for your mean-reversion
-trading algorithm when the market is closed. 
+<h1 align='center'>
+  🍋 Mean Reversion Trading Strategy 🍋 
+</h1>
 
-The actual mean reversion logic is defined in the **main.py** file, with 
-mean_reversion() being the main function. 
+## 👋 Introduction 
 
-## Set up
-To test locally, clone this repo, use the IDE of your choice to run (although we highly recommend PyCharm) and install
-all required packages through the provided requirements.txt file. This project uses the lemon.markets Python SDK, which 
-you will find listed in the requirements.
+This is a public [lemon.markets](https://lemon.markets) repository that demonstrates a simple implementation of the mean-reversion trading strategy with the lemon.markets API. 
+To get a general understanding of the API, please refer to our [documentation](https://docs.lemon.markets).
 
-### Set environment variables
-If you want to test locally, you need to define a number of environment variables.
+A walk-through of this script can be found in our YouTube video.
 
-| ENV Variable |               Explanation               |  
-|--------------|:---------------------------------------:|
-| DATA_API_KEY |        Your market data API key         |
- | TRADING_API_KEY |    Your paper/money trading API key     |
-| MIC          | Market Identifier Code of Trading Venue |
+## 🏃‍♂️ Quick Start
+Not interested in reading a novella before you get started? We get it! To get this project up and running quickly, here's what you need to do:
+1. Clone this repository;
+2. Sign up to [lemon.markets](https://www.lemon.markets/)
+3. Configure your environment variables as outlined in the 'Configuration' section;
+4. Take a look at the demo functions in main.py, and, if you want to, check out our accompanying YouTube video!
+5. Run the script & see how it performs! 
 
-## Deploy to Heroku
+
+## 🔌 API Usage
+
+This project uses the [lemon.markets API](https://www.lemon.markets/en-de/for-developers) and the lemon.markets Python SDK.
+
+lemon.markets is a brokerage API by developers for developers that allows you to build your own experience at the stock market. 
+We will use the Market Data API and Trading API to show you the results you receive when you make calls to the venues, account, and trades endpoints.
+If you do not have a lemon.markets account yet, you can sign up at [lemon.markets](https://www.lemon.markets/).
+
+## ⚙️ Configuration
+
+The script uses several environment variables, configure your .env file as follows:
+
+| ENV Variable    |               Explanation               |
+|-----------------|:---------------------------------------:|
+| DATA_API_KEY    |        Your market data API key         |
+| TRADING_API_KEY |    Your paper/money trading API key     |
+| MIC             | Market Identifier Code of Trading Venue |
+
+
+## ☁️ Deploy to Heroku
 If you are interested in hosting this project in the cloud, 
 we suggest that you use Heroku to do so. To make the hosting 
 work, you need to create a new project and connect 
@@ -42,12 +57,8 @@ Use this button to deploy to Heroku directly.
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/lemon-markets/content-mean-reversion-lemon.markets)
 
 ## Contribute to this repository
-lemon.markets is an API from developers for developers. Therefore, we highly encourage you 
-to get involved by opening a PR or contacting us directly via 
-[support@lemon.markets](mailto:support@lemon.markets).
+lemon.markets is an API from developers for developers and this (and all lemon.markets open source projects) is(are) a work in progress. 
+Therefore, we highly encourage you to get involved by opening a PR or contacting us directly via [support@lemon.markets](mailto:support@lemon.markets).
 
----
+Looking forward to building lemon.markets with you 🍋
 
-Have fun and happy coding,
-
-your 🍋.markets team
