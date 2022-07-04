@@ -52,7 +52,14 @@ def mean_reversion(isin: str = "DE0007664039", x1: str = "d1"):
     :param x1:  pass the market data format you are interested in (m1, h1, or d1)
     """
     load_dotenv()
-
+    quantity = 1
+    price = client.market_data.ohlc.get(
+        isin=isin,
+        from_="latest",
+        period=x1
+    ).results[0].c
+    if price * quantity < 50:
+        print(f"This order totals, €{price * quantity}, which is below the minimum of €50.")
     # check for MR decision
     if mean_reversion_decision(
             isin=isin,
@@ -65,7 +72,7 @@ def mean_reversion(isin: str = "DE0007664039", x1: str = "d1"):
                 isin=isin,
                 expires_at=7,
                 side="buy",
-                quantity=1,
+                quantity=quantity,
                 venue=os.getenv("MIC"),
             )
             order_id = placed_order.results.id
@@ -82,7 +89,7 @@ def mean_reversion(isin: str = "DE0007664039", x1: str = "d1"):
                 isin=isin,
                 expires_at=7,
                 side="sell",
-                quantity=1,
+                quantity=quantity,
                 venue=os.getenv("MIC"),
             )
             # if position in portfolio, activate order
