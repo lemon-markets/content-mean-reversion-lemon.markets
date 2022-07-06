@@ -52,6 +52,11 @@ def mean_reversion(isin: str = "DE0007664039", x1: str = "d1"):
     :param x1:  pass the market data format you are interested in (m1, h1, or d1)
     """
     load_dotenv()
+    venue = client.market_data.venues.get(os.getenv("MIC")).results[0]
+    if venue.is_open:
+        print(f"Your selected venue, {venue.name}, is not open today. Next opening day is: "
+              f"{venue.opening_days[0].day}-{venue.opening_days[0].month}-{venue.opening_days[0].year}")
+        return
     quantity = 1
     price = client.market_data.quotes.get_latest(isin=isin).results[0].a
     if price * quantity < 50:
@@ -101,7 +106,7 @@ def mean_reversion(isin: str = "DE0007664039", x1: str = "d1"):
 
 if __name__ == '__main__':
     scheduler = BlockingScheduler(timezone=utc)
-
+    
     for x in range(13):
         scheduler.add_job(mean_reversion,
                           trigger=CronTrigger(day_of_week="mon-fri",
