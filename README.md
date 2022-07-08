@@ -4,7 +4,9 @@
 
 ## 👋 Introduction 
 
-This is a public [lemon.markets](https://lemon.markets) repository that demonstrates a simple implementation of the mean-reversion trading strategy with the lemon.markets API. 
+This is a public [lemon.markets](https://lemon.markets) repository that demonstrates a simple implementation of the mean-reversion trading strategy with the lemon.markets API.
+Based on your preference you can trade based off the 10-Day Simple Moving Average or the 10-Day Exponential Moving Average with our pre-built functions 
+(the number of days the averages are calculated over can be changed too)!
 To get a general understanding of the API, please refer to our [documentation](https://docs.lemon.markets).
 
 A walk-through of this script can be found in our YouTube video.
