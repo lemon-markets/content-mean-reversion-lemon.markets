@@ -52,7 +52,15 @@ def mean_reversion(isin: str = "DE0007664039", x1: str = "d1"):
     :param x1:  pass the market data format you are interested in (m1, h1, or d1)
     """
     load_dotenv()
-
+    venue = client.market_data.venues.get(os.getenv("MIC")).results[0]
+    if venue.is_open:
+        print(f"Your selected venue, {venue.name}, is not open today. Next opening day is: "
+              f"{venue.opening_days[0].day}-{venue.opening_days[0].month}-{venue.opening_days[0].year}")
+        return
+    quantity = 1
+    price = client.market_data.quotes.get_latest(isin=isin).results[0].a
+    if price * quantity < 50:
+        print(f"This order totals, €{price * quantity}, which is below the minimum order amount of €50.")
     # check for MR decision
     if mean_reversion_decision(
             isin=isin,
@@ -65,7 +73,7 @@ def mean_reversion(isin: str = "DE0007664039", x1: str = "d1"):
                 isin=isin,
                 expires_at=7,
                 side="buy",
-                quantity=1,
+                quantity=quantity,
                 venue=os.getenv("MIC"),
             )
             order_id = placed_order.results.id
@@ -82,7 +90,7 @@ def mean_reversion(isin: str = "DE0007664039", x1: str = "d1"):
                 isin=isin,
                 expires_at=7,
                 side="sell",
-                quantity=1,
+                quantity=quantity,
                 venue=os.getenv("MIC"),
             )
             # if position in portfolio, activate order
@@ -96,36 +104,16 @@ def mean_reversion(isin: str = "DE0007664039", x1: str = "d1"):
             print(f'2{e}')
 
 
-def schedule_trades_for_year():
-    opening_days = client.market_data.venues.get().results[0].opening_days
-
-    for day in opening_days:
-        # using venues endpoint we only schedule trades for days the exchange is open
-        for x in range(13):
-            # using a scheduler, we run the mean reversion logic once per hour starting from 8:30
-            # (based on Munich Stock Exchange hours with times in UTC)
-            scheduler.add_job(mean_reversion,
-                              trigger=CronTrigger(year=day.year,
-                                                  month=day.month,
-                                                  day=day.day,
-                                                  hour=8 + x,
-                                                  minute=30,
-                                                  timezone=utc),
-                              name="Perform Mean Reversion Hourly")
-
-
 if __name__ == '__main__':
     scheduler = BlockingScheduler(timezone=utc)
-
-    schedule_trades_for_year()
-
-    # reschedule your trades for the future years ad infinitum
-    scheduler.add_job(schedule_trades_for_year,
-                      trigger=CronTrigger(month=1,
-                                          day=1,
-                                          hour=0,
-                                          minute=0,
-                                          timezone=utc))
+    
+    for x in range(13):
+        scheduler.add_job(mean_reversion,
+                          trigger=CronTrigger(day_of_week="mon-fri",
+                                              hour=8 + x,
+                                              minute=30,
+                                              timezone=utc),
+                          name="Perform Mean Reversion Hourly")
 
     print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
 
