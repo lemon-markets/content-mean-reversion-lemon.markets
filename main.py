@@ -89,7 +89,7 @@ def mean_reversion_decision(isin: str, x1: str = "d1", num_days=10):
         isin=isin,
         from_=datetime.now().strftime('%Y-%m-%d'),
         mic=os.getenv("MIC")).results[0].c
-    if latest_close_price < simple_moving_avg:  # change this line to use SMA or EMA
+    if latest_close_price < exponential_moving_avg:  # change this line to use SMA or EMA
         return True
     return False
 
@@ -106,7 +106,8 @@ def mean_reversion(isin: str = "DE0007664039", x1: str = "d1"):
         print(f"Your selected venue, {venue.name}, is not open today. Next opening day is: "
               f"{venue.opening_days[0].day}-{venue.opening_days[0].month}-{venue.opening_days[0].year}")
         return
-    quantity = 1
+
+    quantity = 2
     price = client.market_data.quotes.get_latest(isin=isin).results[0].a
     if price * quantity < 50:  # make sure the order amount is large enough to pass through the api
         print(f"This order totals, €{price * quantity}, which is below the minimum order amount of €50.")
