@@ -157,7 +157,7 @@ def mean_reversion(isin: str = "DE0007664039", x1: str = "d1"):
 
 if __name__ == '__main__':
     scheduler = BlockingScheduler(timezone=utc)
-    mean_reversion()
+    
     for x in range(13):
         scheduler.add_job(mean_reversion,
                           trigger=CronTrigger(day_of_week="mon-fri",
