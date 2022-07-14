@@ -17,30 +17,79 @@ client = api.create(
 )
 
 
-def mean_reversion_decision(isin: str, x1: str = "d1"):
+def simple_moving_average_calculator(isin, period, from_date, num_days=10):
+    """
+    :param period: m1, h1, or d1 depending on the period you are calculating with
+    :param num_days: number of days you wish to include in the average
+    :param from_date: the date you want to calculate the SMA for
+    :return: SMA as a number
+    """
+    days_prior = 0
+    prices_close = []
+    while len(prices_close) < num_days:
+        market_data = client.market_data.ohlc.get(
+            isin=isin,
+            from_=from_date.strftime('%Y-%m-%d'),
+            to=from_date.strftime('%Y-%m-%d'),
+            decimals=True,
+            period=period,
+            mic=os.getenv("MIC")
+        )
+        if len(market_data.results) != 0:  # make sure that we aren't counting weekends/holidays
+            prices_close.append(market_data.results[0].c)
+        days_prior += 1
+        from_date = (datetime.now() - timedelta(days=days_prior))
+    return statistics.mean(prices_close)  # SMA calculation
+
+
+def exponential_moving_average_calculator(isin, period, from_date, num_days=10):
+    days_prior = 0
+    past_x_days = []
+    while len(past_x_days) < num_days:  # make a list of the last ten days the market was open
+        market_data = client.market_data.ohlc.get(
+            isin=isin,
+            from_=from_date.strftime('%Y-%m-%d'),
+            to=from_date.strftime('%Y-%m-%d'),
+            period=period
+        )
+        if len(market_data.results) != 0:  # make sure that we aren't counting weekends/holidays
+            past_x_days.insert(0, from_date)
+        days_prior += 1
+        from_date = (datetime.now() - timedelta(days=days_prior))
+
+    exponential_moving_avg = 0
+    ema_yest = simple_moving_average_calculator(isin=isin, period=period, from_date=past_x_days[0])
+    smoothing_factor = 2 / (num_days + 1)
+    for day in past_x_days:  # initialize all variables above, then recursively find the EMA
+        day_x_close_price = client.market_data.ohlc.get(
+            period=period,
+            isin=isin,
+            from_=day.strftime('%Y-%m-%d'),
+            to=day.strftime('%Y-%m-%d'),
+            decimals=True,
+            mic=os.getenv("MIC")).results[0].c
+        exponential_moving_avg = day_x_close_price * smoothing_factor + ema_yest * (1 - smoothing_factor)
+    return exponential_moving_avg
+
+
+def mean_reversion_decision(isin: str, x1: str = "d1", num_days=10):
     """
     :param isin: pass the isin of your instrument
     :param x1: pass what type of data you want to retrieve (m1, h1 or d1)
+    :param num_days: number of days over which the mean should be calculated
     :return: returns whether you should buy (True) or sell (False), depending on MR criteria
     """
-    from_date = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
-    market_data = client.market_data.ohlc.get(
-        isin=isin,
-        from_=from_date,
-        period=x1
-    )
+    simple_moving_avg = simple_moving_average_calculator(isin=isin, period=x1, from_date=datetime.now())
+    print(f'Simple Moving Average Price: {simple_moving_avg}')
+    exponential_moving_avg = exponential_moving_average_calculator(isin=isin, period=x1, from_date=datetime.now())
+    print(f'Exponential Moving Average Price: {exponential_moving_avg}')
 
-    d1_prices = market_data.results
-    prices_close = [x.c for x in d1_prices]  # you can obviously change that to low, close or open
-    mean_price = statistics.mean(prices_close)
-    print(f'Mean Price: {mean_price}')
     latest_close_price = client.market_data.ohlc.get(
+        period=x1,
         isin=isin,
-        from_='latest',
-        period="m1"
-    ).results[0].c
-    print(f'Latest Close Price: {latest_close_price}')
-    if latest_close_price < mean_price:
+        from_=datetime.now().strftime('%Y-%m-%d'),
+        mic=os.getenv("MIC")).results[0].c
+    if latest_close_price < exponential_moving_avg:  # change this line to use SMA or EMA
         return True
     return False
 
@@ -53,14 +102,16 @@ def mean_reversion(isin: str = "DE0007664039", x1: str = "d1"):
     """
     load_dotenv()
     venue = client.market_data.venues.get(os.getenv("MIC")).results[0]
-    if venue.is_open:
+    if not venue.is_open:  # make sure the venue is actually open
         print(f"Your selected venue, {venue.name}, is not open today. Next opening day is: "
               f"{venue.opening_days[0].day}-{venue.opening_days[0].month}-{venue.opening_days[0].year}")
         return
-    quantity = 1
+
+    quantity = 2
     price = client.market_data.quotes.get_latest(isin=isin).results[0].a
-    if price * quantity < 50:
+    if price * quantity < 50:  # make sure the order amount is large enough to pass through the api
         print(f"This order totals, €{price * quantity}, which is below the minimum order amount of €50.")
+
     # check for MR decision
     if mean_reversion_decision(
             isin=isin,
