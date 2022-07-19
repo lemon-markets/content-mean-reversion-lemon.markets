@@ -70,11 +70,10 @@ def exponential_moving_average_calculator(isin, period, from_date, num_days=10):
     return exponential_moving_avg
 
 
-def mean_reversion_decision(isin: str, x1: str = "d1", num_days=10):
+def mean_reversion_decision(isin: str, x1: str = "d1"):
     """
     :param isin: pass the isin of your instrument
     :param x1: pass what type of data you want to retrieve (m1, h1 or d1)
-    :param num_days: number of days over which the mean should be calculated
     :return: returns whether you should buy (True) or sell (False), depending on MR criteria
     """
     simple_moving_avg = simple_moving_average_calculator(isin=isin, period=x1, from_date=datetime.now())
