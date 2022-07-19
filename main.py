@@ -53,7 +53,6 @@ def exponential_moving_average_calculator(isin, period, from_date, num_days=10):
         if len(market_data.results) != 0:  # make sure that we aren't counting weekends/holidays
             past_x_days.insert(0, from_date)
         from_date = (from_date - timedelta(days=1))
-    print(past_x_days)
     exponential_moving_avg = 0
     ema_yest = simple_moving_average_calculator(isin=isin, period=period, from_date=past_x_days[0])
     multiplier = 2 / (num_days + 1)
