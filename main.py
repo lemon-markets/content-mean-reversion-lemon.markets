@@ -41,9 +41,9 @@ def simple_moving_average_calculator(isin, period, from_date, num_days=10):
     return statistics.mean(prices_close)  # SMA calculation
 
 
-def exponential_moving_average_calculator(isin, period, from_date, num_days=10):
+def exponential_moving_average_calculator(isin, period, from_date, num_days=10, smoothing=2):
     past_x_days = []
-    while len(past_x_days) < num_days:  # make a list of the last ten days the market was open
+    while len(past_x_days) < num_days + 1:  # make a list of the last x days the market was open
         market_data = client.market_data.ohlc.get(
             isin=isin,
             from_=from_date.strftime('%Y-%m-%d'),
@@ -55,7 +55,7 @@ def exponential_moving_average_calculator(isin, period, from_date, num_days=10):
         from_date = (from_date - timedelta(days=1))
     exponential_moving_avg = 0
     ema_yest = simple_moving_average_calculator(isin=isin, period=period, from_date=past_x_days[0])
-    multiplier = 2 / (num_days + 1)
+    multiplier = smoothing / (num_days + 1)
     for day in past_x_days:  # initialize all variables above, then recursively find the EMA
         day_x_close_price = client.market_data.ohlc.get(
             period=period,
