@@ -159,9 +159,6 @@ def mean_reversion(isin: str = "DE0007664039"):
 if __name__ == '__main__':
     scheduler = BlockingScheduler(timezone=utc)  # coordinated universal time, CET is UTC+1 (CEST is UTC+2)
 
-    print(simple_moving_average_calculator(isin="DE0007664039", from_date=datetime(2022, 7, 22), num_days=20))
-    print(exponential_moving_average_calculator(isin="DE0007664039", from_date=datetime(2022, 7, 22), num_days=20))
-
     for x in range(13):
         scheduler.add_job(mean_reversion,
                           trigger=CronTrigger(day_of_week="mon-fri",
