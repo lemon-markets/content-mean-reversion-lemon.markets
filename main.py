@@ -152,12 +152,12 @@ def mean_reversion(isin: str = "DE0007664039", x1: str = "d1"):
 
 
 if __name__ == '__main__':
-    scheduler = BlockingScheduler(timezone=utc)
+    scheduler = BlockingScheduler(timezone=utc)  # coordinated universal time, CET is UTC+1 (CEST is UTC+2)
 
     for x in range(13):
         scheduler.add_job(mean_reversion,
                           trigger=CronTrigger(day_of_week="mon-fri",
-                                              hour=8 + x,
+                                              hour=6 + x,
                                               minute=30,
                                               timezone=utc),
                           name="Perform Mean Reversion Hourly")
