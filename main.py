@@ -17,7 +17,7 @@ client = api.create(
 )
 
 
-def simple_moving_average_calculator(isin, period, from_date, num_days=10):
+def simple_moving_average_calculator(isin, from_date, num_days=10):
     """
     :param isin: isin of stock/ETF you want to calculate the average for
     :param period: m1, h1, or d1 depending on the period you are calculating with
@@ -32,7 +32,7 @@ def simple_moving_average_calculator(isin, period, from_date, num_days=10):
             from_=from_date.strftime('%Y-%m-%d'),
             to=from_date.strftime('%Y-%m-%d'),
             decimals=True,
-            period=period,
+            period='d1',
             mic=os.getenv("MIC")
         )
         if len(market_data.results) != 0:  # make sure that we aren't counting weekends/holidays
@@ -41,24 +41,24 @@ def simple_moving_average_calculator(isin, period, from_date, num_days=10):
     return statistics.mean(prices_close)  # SMA calculation
 
 
-def exponential_moving_average_calculator(isin, period, from_date, num_days=10, smoothing=2):
+def exponential_moving_average_calculator(isin, from_date, num_days=10, smoothing=2):
     past_x_days = []
     while len(past_x_days) < num_days + 1:  # make a list of the last x days the market was open
         market_data = client.market_data.ohlc.get(
             isin=isin,
             from_=from_date.strftime('%Y-%m-%d'),
             to=from_date.strftime('%Y-%m-%d'),
-            period=period
+            period='d1'
         )
         if len(market_data.results) != 0:  # make sure that we aren't counting weekends/holidays
             past_x_days.insert(0, from_date)
         from_date = (from_date - timedelta(days=1))
     exponential_moving_avg = 0
-    ema_yest = simple_moving_average_calculator(isin=isin, period=period, from_date=past_x_days[0])
+    ema_yest = simple_moving_average_calculator(isin=isin, from_date=past_x_days[0])
     multiplier = smoothing / (num_days + 1)
     for day in past_x_days:  # initialize all variables above, then recursively find the EMA
         day_x_close_price = client.market_data.ohlc.get(
-            period=period,
+            period='d1',
             isin=isin,
             from_=day.strftime('%Y-%m-%d'),
             to=day.strftime('%Y-%m-%d'),
@@ -69,19 +69,19 @@ def exponential_moving_average_calculator(isin, period, from_date, num_days=10, 
     return exponential_moving_avg
 
 
-def mean_reversion_decision(isin: str, x1: str = "d1"):
+def mean_reversion_decision(isin: str):
     """
     :param isin: pass the isin of your instrument
     :param x1: pass what type of data you want to retrieve (m1, h1 or d1)
     :return: returns whether you should buy (True) or sell (False), depending on MR criteria
     """
-    simple_moving_avg = simple_moving_average_calculator(isin=isin, period=x1, from_date=datetime.now())
+    simple_moving_avg = simple_moving_average_calculator(isin=isin, from_date=datetime.now())
     print(f'Simple Moving Average Price: {simple_moving_avg}')
-    exponential_moving_avg = exponential_moving_average_calculator(isin=isin, period=x1, from_date=datetime.now())
+    exponential_moving_avg = exponential_moving_average_calculator(isin=isin, from_date=datetime.now())
     print(f'Exponential Moving Average Price: {exponential_moving_avg}')
 
     latest_close_price = client.market_data.ohlc.get(
-        period=x1,
+        period='d1',
         isin=isin,
         from_=datetime.now().strftime('%Y-%m-%d'),
         decimals=True,
@@ -92,11 +92,10 @@ def mean_reversion_decision(isin: str, x1: str = "d1"):
     return False
 
 
-def mean_reversion(isin: str = "DE0007664039", x1: str = "d1"):
+def mean_reversion(isin: str = "DE0007664039"):
     """
     :param isin: pass the isin of the stock you are interested in,
                 the default is Volkswagen here, but you can obviously use any ISIN you like :)
-    :param x1:  pass the market data format you are interested in (m1, h1, or d1)
     """
     load_dotenv()
     venue = client.market_data.venues.get(os.getenv("MIC")).results[0]
@@ -112,8 +111,7 @@ def mean_reversion(isin: str = "DE0007664039", x1: str = "d1"):
 
     # check for MR decision
     if mean_reversion_decision(
-            isin=isin,
-            x1=x1
+            isin=isin
     ):
         # create a buy order if True is returned by MR decision function
         try:
@@ -154,7 +152,7 @@ def mean_reversion(isin: str = "DE0007664039", x1: str = "d1"):
 
 
 if __name__ == '__main__':
-    scheduler = BlockingScheduler(timezone=utc)
+    scheduler = BlockingScheduler(timezone=utc)  # coordinated universal time, CET is UTC+1 (CEST is UTC+2)
 
     print(simple_moving_average_calculator(isin="DE0007664039", period="d1", from_date=datetime(2022, 7, 22), num_days=20))
     print(exponential_moving_average_calculator(isin="DE0007664039", period="d1", from_date=datetime(2022, 7, 22), num_days=20))
@@ -162,7 +160,7 @@ if __name__ == '__main__':
     for x in range(13):
         scheduler.add_job(mean_reversion,
                           trigger=CronTrigger(day_of_week="mon-fri",
-                                              hour=8 + x,
+                                              hour=6 + x,
                                               minute=30,
                                               timezone=utc),
                           name="Perform Mean Reversion Hourly")
