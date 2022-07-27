@@ -20,7 +20,6 @@ client = api.create(
 def simple_moving_average_calculator(isin, from_date, num_days=10):
     """
     :param isin: isin of stock/ETF you want to calculate the average for
-    :param period: m1, h1, or d1 depending on the period you are calculating with
     :param num_days: number of days you wish to include in the average
     :param from_date: the date you want to calculate the SMA for
     :return: SMA as a number
@@ -42,6 +41,13 @@ def simple_moving_average_calculator(isin, from_date, num_days=10):
 
 
 def exponential_moving_average_calculator(isin, from_date, num_days=10, smoothing=2):
+    """
+    :param isin: isin of stock/ETF you want to calculate the average for
+    :param num_days: number of days you wish to include in the average
+    :param from_date: the date you want to calculate the EMA for
+    :param smoothing: the smoothing factor you want to use for your EMA calculations
+    :return: EMA as a number
+    """
     past_x_days = []
     while len(past_x_days) < num_days + 1:  # make a list of the last x days the market was open
         market_data = client.market_data.ohlc.get(
@@ -72,7 +78,6 @@ def exponential_moving_average_calculator(isin, from_date, num_days=10, smoothin
 def mean_reversion_decision(isin: str):
     """
     :param isin: pass the isin of your instrument
-    :param x1: pass what type of data you want to retrieve (m1, h1 or d1)
     :return: returns whether you should buy (True) or sell (False), depending on MR criteria
     """
     simple_moving_avg = simple_moving_average_calculator(isin=isin, from_date=datetime.now())
@@ -154,8 +159,8 @@ def mean_reversion(isin: str = "DE0007664039"):
 if __name__ == '__main__':
     scheduler = BlockingScheduler(timezone=utc)  # coordinated universal time, CET is UTC+1 (CEST is UTC+2)
 
-    print(simple_moving_average_calculator(isin="DE0007664039", period="d1", from_date=datetime(2022, 7, 22), num_days=20))
-    print(exponential_moving_average_calculator(isin="DE0007664039", period="d1", from_date=datetime(2022, 7, 22), num_days=20))
+    print(simple_moving_average_calculator(isin="DE0007664039", from_date=datetime(2022, 7, 22), num_days=20))
+    print(exponential_moving_average_calculator(isin="DE0007664039", from_date=datetime(2022, 7, 22), num_days=20))
 
     for x in range(13):
         scheduler.add_job(mean_reversion,
